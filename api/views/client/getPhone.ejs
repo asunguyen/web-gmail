@@ -1,0 +1,129 @@
+<!-- Navbar -->
+<%- include("../client/layout/layoutSidebar.ejs") %>
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <section class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1>Thuê số nhanh</h1>
+                    </div>
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-right">
+                            <li class="breadcrumb-item"><a href="#" class="amount-account"></a></li>
+                            <li class="breadcrumb-item active" id="username-account"></li>
+                        </ol>
+                    </div>
+                </div>
+            </div><!-- /.container-fluid -->
+        </section>
+
+        <!-- Main content -->
+        <section class="content">
+
+            <!-- Default box -->
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <marquee id="thongbao-marquee" direction="left" style="color: red;"> Thông báo: Chưa có thông báo nào</marquee>
+                    </div>
+                    <div class="row">
+                        <div class="col-3">
+                            <div class="form-group">
+                                <label for="quocgia">Quốc gia</label>
+                                <select class="form-control" id="quocgia">
+                                    <option value="vn1" selected>Việt Nam 1</option>
+                                    <option value="vn2">Việt Nam 2</option>
+                                    <option value="vn3">Việt Nam 3</option>
+                                    <option value="cam">Campuchia</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-3">
+                            <label>Dịch vụ</label>
+                            <div class="input-group">
+                                <select class="form-control" id="dichvu">
+                                    <option value="Google" selected>Google - 850đ</option>
+                                    <option value="Microsoft">Microsoft - 700đ</option>
+                                    <option value="Discord">Discord - 1000đ</option>
+                                    <option value="Telegram">Telegram - 4000đ</option>
+                                    <option value="Facebook">Facebook - 850đ</option>
+                                    <option value="Whatsapp">Whatsapp - 3500đ</option>
+                                    <option value="Cloudways">Cloudways - 700đ</option>
+                                </select>
+                            </div>
+
+                        </div>
+                        <div class="col-3">
+                            <label>Số luồng</label>
+                            <div class="input-group">
+                                <input type="number" min="1" id="luong" placeholder="nhập số luồng test">
+                                <div class="input-group-prepend">
+                                    <button type="button" class="amount-custom btn btn-outline-success"
+                                        id="thuesongay">Test lấy số</button>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="row">
+                        <ul id="data-test"></ul>
+                    </div>
+                </div>
+                <!-- /.card-footer-->
+            </div>
+            <!-- /.card -->
+
+        </section>
+        <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+
+
+    <%- include("../client/layout/layoutFooter.ejs") %>
+
+        <script>
+            //get list
+            var arrSet = [];
+            $(document).ready(function () {
+                var user = localStorage.getItem("user");
+                if (user) {
+                    user = JSON.parse(user);
+                } else {
+                    window.location.href = "/login";
+                }
+                
+                async function createPhone() {
+                    $(".loading-wp").show();
+                    var quocgia1 = $("#quocgia").val();
+                    var dichvu1 = $("#dichvu").val();
+                    const data = {
+                        quocgia: quocgia1,
+                        dichvu: dichvu1,
+                        time: new Date().getTime()
+                    }
+                    let res = await api.post("thueso/create", JSON.stringify(data));
+                    if (res && res.code == 200) {
+                       let html = `<li>${JSON.stringify(res.data)}</li>`;
+                        $("#data-test").append(html);
+                    } else {
+                        alert(res.error);
+                    }
+                    $(".loading-wp").hide();
+                }
+                //thue so
+                $("#thuesongay").unbind("click").click(function () {
+                    var luong = $("#luong").val();
+                    luong = parseFloat(luong);
+                    if (luong > 0) {
+                        for(var i = 0; i < luong - 1; i++) {
+                            createPhone();
+                        }
+                    }
+                    
+                });
+               
+            });
+        </script>

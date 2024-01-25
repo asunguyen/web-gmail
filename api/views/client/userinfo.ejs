@@ -1,0 +1,122 @@
+<!-- Navbar -->
+<%- include("../client/layout/layoutSidebar.ejs") %>
+
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1>Thông tin tài khoản</h1>
+          </div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="#" class="amount-account"></a></li>
+              <li class="breadcrumb-item active" id="username-account"></li>
+            </ol>
+          </div>
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+
+      <!-- Default box -->
+      <div class="row">
+        <div class="col-lg-6 col-6">
+          <!-- small box -->
+          <div class="small-box bg-danger">
+            <div class="inner">
+              <h3 id="total-pay"></h3>
+
+              <p>Tổng tiền đã nạp</p>
+            </div>
+            <div class="icon">
+              <i class="ion ion-pie-graph"></i>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-6 col-6">
+          <!-- small box -->
+          <div class="small-box bg-info">
+            <div class="inner">
+              <h3 class="amount-account"></h3>
+
+              <p>Số dư</p>
+            </div>
+            <div class="icon">
+              <i class="ion ion-bag"></i>
+            </div>
+          </div>
+        </div>
+        <!-- ./col -->
+        <div class="col-lg-6 col-6">
+          <!-- small box -->
+          <div class="small-box bg-success">
+            <div class="inner">
+              <h3 id="total-request"></h3>
+
+              <p>Tổng số Request</p>
+            </div>
+            <div class="icon">
+              <i class="ion ion-stats-bars"></i>
+            </div>
+          </div>
+        </div>
+        <!-- ./col -->
+        <div class="col-lg-6 col-6">
+          <!-- small box -->
+          <div class="small-box bg-warning">
+            <div class="inner">
+              <h3 id="total-otp"></h3>
+
+              <p>Tổng số OTP</p>
+            </div>
+            <div class="icon">
+              <i class="ion ion-person-add"></i>
+            </div>
+          </div>
+        </div>
+        <!-- ./col -->
+
+        <!-- ./col -->
+      </div>
+      <!-- /.card -->
+
+    </section>
+    <!-- /.content -->
+  </div>
+  <!-- /.content-wrapper -->
+
+
+  <%- include("../client/layout/layoutFooter.ejs") %>
+
+    <script>
+      $(document).ready(function () {
+        let total = localStorage.getItem("totalUser");
+        if (total && total.length > 0) {
+          total = JSON.parse(total);
+          $("#total-pay").text(total.totalPay || 0);
+          $("#total-request").text(total.totalRequest || 0);
+          $("#total-otp").text(total.totalOTP || 0);
+        } else {
+          setTimeout(function () {
+            let total = localStorage.getItem("totalUser");
+            total = JSON.parse(total);
+            $("#total-pay").text(total.totalPay || 0);
+            $("#total-request").text(total.totalRequest || 0);
+            $("#total-otp").text(total.totalOTP || 0);
+          }, 3000);
+        }
+
+        let user = localStorage.getItem("user");
+        if (user && user.length > 0) {
+          user = JSON.parse(user);
+        } else {
+          window.location.href = "/login"
+        }
+        $("#token-user").text(user._id);
+      })
+    </script>

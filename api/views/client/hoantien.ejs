@@ -1,0 +1,240 @@
+<!-- Navbar -->
+<%- include("../client/layout/layoutSidebar.ejs") %>
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <section class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1>Hoàn tiền</h1>
+                    </div>
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-right">
+                            <li class="breadcrumb-item"><a href="#" class="amount-account"></a></li>
+                            <li class="breadcrumb-item active" id="username-account"></li>
+                        </ol>
+                    </div>
+                </div>
+            </div><!-- /.container-fluid -->
+        </section>
+
+        <!-- Main content -->
+        <section class="content">
+
+            <!-- Default box -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="input-group w-100">
+                        <input type="text" placeholder="Nhập username của tài khoản tra cứu" id="username" />
+                        <div class="input-group-prepend">
+                            <button type="button" class="amount-custom btn btn-outline-success" id="tracuu">Tra cứu
+                                thông tin</button>
+                                <button type="button" class="amount-custom btn btn-outline-info" id="hoantienuser">Hoàn
+                                    tiền</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="row">
+                <label class="w-100 pl-2 mt-3">Thông tin tài khoản <p class="userTracuu"></p></label>
+                <div class="col-lg-4 col-4">
+                    <!-- small box -->
+                    <div class="small-box bg-danger">
+                        <div class="inner">
+                            <h3 id="tong-tien-nap"></h3>
+
+                            <p>Tổng tiền đã nạp</p>
+                        </div>
+                        <div class="icon">
+                            <i class="ion ion-pie-graph"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-4">
+                    <!-- small box -->
+                    <div class="small-box bg-danger">
+                        <div class="inner">
+                            <h3 id="tong-tien-bonus"></h3>
+
+                            <p>Tổng tiền bonus</p>
+                        </div>
+                        <div class="icon">
+                            <i class="ion ion-pie-graph"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-4">
+                    <!-- small box -->
+                    <div class="small-box bg-danger">
+                        <div class="inner">
+                            <h3 id="tong-tien"></h3>
+
+                            <p>Tổng tiền</p>
+                        </div>
+                        <div class="icon">
+                            <i class="ion ion-pie-graph"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- ./col -->
+                <div class="col-lg-4 col-4">
+                    <!-- small box -->
+                    <div class="small-box bg-success">
+                        <div class="inner">
+                            <h3 id="tong-request-pending"></h3>
+
+                            <p>Tổng số Request Pending</p>
+                        </div>
+                        <div class="icon">
+                            <i class="ion ion-stats-bars"></i>
+                        </div>
+                    </div>
+                </div>
+                <!-- ./col -->
+                <div class="col-lg-4 col-4">
+                    <!-- small box -->
+                    <div class="small-box bg-success">
+                        <div class="inner">
+                            <h3 id="tong-request-quahan"></h3>
+
+                            <p>Tổng số Request hết time</p>
+                        </div>
+                        <div class="icon">
+                            <i class="ion ion-stats-bars"></i>
+                        </div>
+                    </div>
+                </div>
+                <!-- ./col -->
+                <div class="col-lg-4 col-4">
+                    <!-- small box -->
+                    <div class="small-box bg-success">
+                        <div class="inner">
+                            <h3 id="tong-request-otp"></h3>
+
+                            <p>Tổng số Request có OTP</p>
+                        </div>
+                        <div class="icon">
+                            <i class="ion ion-stats-bars"></i>
+                        </div>
+                    </div>
+                </div>
+                <!-- ./col -->
+                <div class="col-lg-4 col-4">
+                    <!-- small box -->
+                    <div class="small-box bg-warning">
+                        <div class="inner">
+                            <h3 id="tong-tien-request-pending"></h3>
+
+                            <p>Tổng tiền request pending</p>
+                        </div>
+                        <div class="icon">
+                            <i class="ion ion-person-add"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-4">
+                    <!-- small box -->
+                    <div class="small-box bg-warning">
+                        <div class="inner">
+                            <h3 id="tong-tien-qua-han"></h3>
+
+                            <p>Tổng tiền time quá hạn đã được hoàn</p>
+                        </div>
+                        <div class="icon">
+                            <i class="ion ion-person-add"></i>
+                        </div>
+                    </div>
+                </div>
+                <!-- ./col -->
+                <div class="col-lg-4 col-4">
+                    <!-- small box -->
+                    <div class="small-box bg-warning">
+                        <div class="inner">
+                            <h3 id="tong-tien-otp"></h3>
+
+                            <p>Tổng tiền thanh toán OTP</p>
+                        </div>
+                        <div class="icon">
+                            <i class="ion ion-stats-bars"></i>
+                        </div>
+                    </div>
+                </div>
+                <!-- ./col -->
+                <div class="col-lg-4 col-4">
+                    <!-- small box -->
+                    <div class="small-box bg-info">
+                        <div class="inner">
+                            <h3 id="so-du-vi"></h3>
+
+                            <p>Số dư vi</p>
+                        </div>
+                        <div class="icon">
+                            <i class="ion ion-bag"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- /.card -->
+
+        </section>
+        <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+
+
+    <%- include("../client/layout/layoutFooter.ejs") %>
+
+        <script>
+            $(document).ready(function () {
+                let user = localStorage.getItem("user");
+                if (user && user.length > 0) {
+                    user = JSON.parse(user);
+                } else {
+                    window.location.href = "/login"
+                }
+                $("#token-user").text(user._id);
+            });
+            async function tracuuthongtin() {
+                let username = $("#username").val();
+                let res = await api.post("admin/manager/info-user", JSON.stringify({ username: username }));
+                if (res && res.code == 200) {
+
+                    $('.userTracuu').text(res.data.user.username);
+                    $('#tong-tien-nap').text(res.data.totalPayUser.tiennap * 1000);
+                    $("#tong-tien-bonus").text(res.data.totalPayUser.tienbonus * 1000)
+                    $('#tong-tien').text(res.data.totalPayUser.tongtien * 1000);
+                    $("#so-du-vi").text(res.data.amount);
+                    $(".amount-account").text(res.data.amount);
+
+
+                    $('#tong-request-pending').text(res.data.totalRequest.totalRq);
+                    $('#tong-request-quahan').text(res.data.totalRequest.totalExp);
+                    $("#tong-request-otp").text(res.data.totalRequest.totalOtp);
+
+                    $("#tong-tien-request-pending").text(res.data.totalRequest.totalPayRq);
+                    $("#tong-tien-qua-han").text(res.data.totalRequest.totalPayExp);
+                    $("#tong-tien-otp").text(res.data.totalRequest.totalPayOtp);
+
+
+
+
+                } else {
+                    alert(res.error);
+                }
+            }
+            async function hoanthien() {
+                let username = $("#username").val();
+                let res = await api.post("admin/manager/hoantien-user", JSON.stringify({ username: username }));
+            }
+
+            $("#tracuu").unbind("click").click(function () {
+                tracuuthongtin();
+            });
+            $("#hoantienuser").unbind("click").click(function () {
+                hoanthien();
+            });
+        </script>

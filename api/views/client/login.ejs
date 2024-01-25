@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
+        integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+    <link rel="stylesheet" href="../../public/css/style-client.css">
+    <title>Ktool Dịch vụ mạng xã hội uy tín số 1</title>
+</head>
+
+<body>
+    <div class="container">
+        <div class="form-login">
+            <h2 style="color: #fff; text-align: center;">KTOOL</h2>
+            <div class="row">
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Username</label>
+                    <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="username"
+                        placeholder="Enter Username">
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group">
+                    <label for="exampleInputPassword1">Password</label>
+                    <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
+                </div>
+            </div>
+            <div class="row">
+                <button type="button" id="login-btn" class="btn btn-primary">Login</button>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- Option 1: jQuery and Bootstrap Bundle (includes Popper) -->
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct"
+        crossorigin="anonymous"></script>
+    <script src="../../public/js/resfull.js"></script>
+    <script>
+        localStorage.setItem("token", "");
+        localStorage.setItem("user", "");
+        localStorage.setItem("totalUser", "");
+        $(document).ready(function () {
+            localStorage.setItem("token", "");
+            localStorage.setItem("user", "");
+            localStorage.setItem("totalUser", "");
+
+            async function login() {
+                var email = $('#exampleInputEmail1').val();
+                var pass = $("#exampleInputPassword1").val();
+                const data = {
+                    username: email,
+                    password: pass
+                }
+                let res = await api.post("auth/login", JSON.stringify(data));
+                if (res && res.code == 200) {
+                    localStorage.setItem("token", res.token);
+                    localStorage.setItem("user", JSON.stringify(res.data));
+                    window.location.href = "/info-user"
+                } else {
+                    alert(res.error);
+                }
+            }
+            $('#login-btn').unbind("click").click(function (e) {
+                e.stopPropagation();
+                e.preventDefault();
+                login();
+            })
+        })
+    </script>
+</body>
+
+</html>

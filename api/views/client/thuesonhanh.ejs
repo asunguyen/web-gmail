@@ -1,0 +1,246 @@
+<!-- Navbar -->
+<%- include("../client/layout/layoutSidebar.ejs") %>
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <section class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1>Thuê số nhanh</h1>
+                    </div>
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-right">
+                            <li class="breadcrumb-item"><a href="#" class="amount-account"></a></li>
+                            <li class="breadcrumb-item active" id="username-account"></li>
+                        </ol>
+                    </div>
+                </div>
+            </div><!-- /.container-fluid -->
+        </section>
+
+        <!-- Main content -->
+        <section class="content">
+
+            <!-- Default box -->
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <marquee id="thongbao-marquee" direction="left" style="color: red;"> Thông báo: Chưa có thông báo nào</marquee>
+                    </div>
+                    <div class="row">
+                        <div class="col-3">
+                            <div class="form-group">
+                                <label for="quocgia">Quốc gia</label>
+                                <select class="form-control" id="quocgia">
+                                    <option value="vn1" selected>Việt Nam 1</option>
+                                    <option value="vn2">Việt Nam 2</option>
+                                    <option value="vn3">Việt Nam 3</option>
+                                    <option value="cam">Campuchia</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-9">
+                            <label>Dịch vụ</label>
+                            <div class="input-group">
+                                <select class="form-control" id="dichvu">
+                                    <option value="Google" selected>Google - 850đ</option>
+                                    <option value="Microsoft">Microsoft - 700đ</option>
+                                    <option value="Discord">Discord - 1000đ</option>
+                                    <option value="Telegram">Telegram - 4000đ</option>
+                                    <option value="Facebook">Facebook - 850đ</option>
+                                    <option value="Whatsapp">Whatsapp - 3500đ</option>
+                                    <option value="Cloudways">Cloudways - 700đ</option>
+                                </select>
+                                <div class="input-group-prepend">
+                                    <button type="button" class="amount-custom btn btn-outline-success"
+                                        id="thuesongay">Thuê số ngay</button>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="row">
+                        <table class="table">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th scope="col">STT</th>
+                                    <th scope="col">Phone</th>
+                                    <th scope="col">OTP</th>
+                                    <th scope="col">Brand</th>
+                                    <th scope="col">Giá</th>
+                                    <th scope="col">Ngày tạo</th>
+                                    <th scope="col">Trạng thái</th>
+                                </tr>
+                            </thead>
+                            <tbody id="list-pay">
+                            </tbody>
+                        </table>
+                        <div id="demo"></div>
+                    </div>
+                </div>
+                <!-- /.card-footer-->
+            </div>
+            <!-- /.card -->
+
+        </section>
+        <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+
+
+    <%- include("../client/layout/layoutFooter.ejs") %>
+
+        <script>
+            //get list
+            var arrSet = [];
+            $(document).ready(function () {
+                async function getDetail(codeID) {
+                    let res = await api.post("thueso/detail", JSON.stringify({ code: codeID }));
+                    if (res && res.code == 200) {
+                        if (res.data.status == 0) {
+                            if (arrSet.findIndex(x => x === codeID) < 0) {
+                                arrSet.push(codeID);
+                            }
+                            setTimeout(function () {
+                                getDetail(codeID);
+                            }, 15000);
+                        }
+                        
+                        var stt = "";
+                        switch (res.data.status) {
+                            case 0:
+                                stt = "pending"
+                                break;
+                            case 1:
+                                stt = "done"
+                                break;
+                            case 3:
+                                stt = "expired"
+                                break;
+                        }
+                        $("#"+codeID+" .status").text(stt);
+                        if (res.data.otp && res.data.otp.length > 0) {
+                            $("#"+codeID+" .otp").text(res.data.otp.match(/\d+/));
+                        }
+                        
+                        $(".amount-account").text(res.user.amount + " vnđ");
+                    }else {
+                        $("#"+codeID+" .status").text("expired");
+                    }
+                };
+                var user = localStorage.getItem("user");
+                if (user) {
+                    user = JSON.parse(user);
+                } else {
+                    window.location.href = "/login";
+                }
+                async function showListData(data) {
+                    var html = ``;
+                    for (var i = 0; i < data.length; i++) {
+                        var stt = "";
+                        var datei = new Date(data[i].createdAt);
+                        switch (data[i].status) {
+                            case 0:
+                                stt = "pending"
+                                break;
+                            case 1:
+                                stt = "done"
+                                break;
+                            case 3:
+                                stt = "expired"
+                                break;
+                        }
+                        html += `<tr id="` + data[i].codeID + `">
+                            <th scope="row">`+ (i + 1) + `</th>
+                            <td>`+ data[i].phoneNumber + `</td>
+                            <td class="otp">`;
+                            if (data[i].otp && data[i].otp.length > 0){
+                                html += data[i].otp.match(/\d+/);
+                            }
+                            html += `</td>
+                            <td>`+ data[i].brand + `</td>
+                            <td>`+ data[i].amount + `</td>
+                            <td>`+ datei.getFullYear() + "-" + (datei.getMonth() + 1) + "-" + datei.getDate() + ":" + datei.getHours() + ":" + datei.getMinutes() + ":" + datei.getSeconds() + `</td>
+                            <td class="status">`+ stt + `</td>
+                        </tr>`;
+                        if (data[i].status == 0 && arrSet.findIndex(x => x === data[i].codeID) < 0) {
+                            await getDetail(data[i].codeID);
+                        }
+                    }
+                    $("#list-pay").html(html);
+                }
+                var getPage = function (total) {
+                    let ref = [];
+                    for (var i = 0; i < total; i++) {
+                        ref.push(i + 1);
+                    }
+                    return ref;
+                }
+                async function getListPay(page, pagea) {
+                    let res = await api.get("thueso/list?page=" + page);
+                    if (res && res.code == 200) {
+                        showListData(res.data.data);
+                        let totalPage = res.data.totalPage || 1;
+                        $('#demo').unbind("pagination").pagination({
+                            dataSource: getPage(totalPage),
+                            pageSize: 1,
+                            showPrevious: false,
+                            showNext: false,
+                            afterPageOnClick: function (data, pagination) {
+                                let pageActive = pagination;
+                                getListPay(pagination, pageActive);
+                            },
+                            callback: function (data, pagination) {
+                                if (pagea) {
+                                    $(".paginationjs-page").removeClass("active");
+                                    $('.paginationjs-page[data-num=' + pagea + ']').addClass("active");
+                                }
+                            }
+                        })
+                    } else {
+                        showListData([]);
+                    }
+                }
+                getListPay();
+                async function createPhone() {
+                    $(".loading-wp").show();
+                    var quocgia1 = $("#quocgia").val();
+                    var dichvu1 = $("#dichvu").val();
+                    const data = {
+                        quocgia: quocgia1,
+                        dichvu: dichvu1,
+                        time: new Date().getTime()
+                    }
+                    let res = await api.post("thueso/create", JSON.stringify(data));
+                    if (res && res.code == 200) {
+                        await getDetail(res.data.codeID);
+                        getListPay();
+                    } else {
+                        alert(res.error);
+                    }
+                    $(".loading-wp").hide();
+                }
+                //thue so
+                $("#thuesongay").unbind("click").click(function () {
+                    createPhone();
+                });
+                async function getAllthongbao() {
+                    $(".loading-wp").show();
+                    let res = await api.get("notice/active");
+                    var html = "Thông báo: ";
+                    if (res && res.code == 200 && res.data.length > 0) {
+                       for(var i = 0; i < res.data.length; i++) {
+                        html += (i+1)+ "- " + res.data[i].content + "; "
+                       }
+                       
+                    } else {
+                        html = "Chưa có thông báo nào";
+                    }
+                    $("#thongbao-marquee").text(html);
+                    $(".loading-wp").hide();
+                };
+                getAllthongbao();
+            });
+        </script>

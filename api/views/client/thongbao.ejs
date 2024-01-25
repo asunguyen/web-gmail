@@ -1,0 +1,171 @@
+<!-- Navbar -->
+<%- include("../client/layout/layoutSidebar.ejs") %>
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <section class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1>Quản lý thông báo</h1>
+                    </div>
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-right">
+                            <li class="breadcrumb-item"><a href="#" class="amount-account"></a></li>
+                            <li class="breadcrumb-item active" id="username-account"></li>
+                        </ol>
+                    </div>
+                </div>
+            </div><!-- /.container-fluid -->
+        </section>
+
+        <!-- Main content -->
+        <section class="content">
+
+            <!-- Default box -->
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+
+                        <div class="col-3">
+                            <div class="form-group">
+                                <label for="title-notice">Title</label>
+                                <input class="form-control" id="title-notice" type="text"
+                                    placeholder="Vui lòng nhập title">
+                            </div>
+                            <button type="button" class="amount-custom btn btn-outline-success" id="taothongbao">Tạo
+                                thông báo</button>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label for="content-notice">Content</label>
+                                <textarea class="form-control" id="content-notice" type="text"
+                                    placeholder="Vui lòng nhập content"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <table class="table">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th scope="col">STT</th>
+                                    <th scope="col">Title</th>
+                                    <th scope="col">Content</th>
+                                    <th scope="col">Trạng thái</th>
+                                    <th scope="col">Hành động</th>
+                                </tr>
+                            </thead>
+                            <tbody id="list-thongbao">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <!-- /.card-footer-->
+            </div>
+            <!-- /.card -->
+
+        </section>
+        <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+
+
+    <%- include("../client/layout/layoutFooter.ejs") %>
+
+        <script>
+            //get list
+            var arrSet = [];
+            $(document).ready(function () {
+                var user = localStorage.getItem("user");
+                if (user) {
+                    user = JSON.parse(user);
+                } else {
+                    window.location.href = "/login";
+                }
+                async function showListData(data) {
+                    var html = ``;
+                    for (var i = 0; i < data.length; i++) {
+                        html += `<tr id="${data[i]._id}">
+                            <th scope="row">${(i + 1)}</th>
+                            <td>${data[i].title}</td>
+                            <td>${data[i].content}</td>
+                            <td>${data[i].status}</td>`;
+                        if (data[i].status) {
+                            html += `<td><button type="button" class="btn btn-outline-success delete-custom" id="${data[i]._id}">Tạm ẩn</button></td>`
+                        } else {
+                            html += `<td><button type="button" class="btn btn-outline-success update-custom" id="${data[i]._id}">Sử dụng</button></td>`
+                        }
+
+                        html += `</tr>`;
+                    }
+                    $("#list-thongbao").html(html);
+                    $(".delete-custom").unbind("click").click(function () {
+                        var id = $(this).attr("id");
+                        deleteNotice(id);
+                    });
+                    $(".update-custom").unbind("click").click(function () {
+                        var id = $(this).attr("id");
+                        activeNotice(id);
+                    });
+
+                }
+                async function getlistNotice(page, pagea) {
+                    let res = await api.get("notice");
+                    if (res && res.code == 200) {
+                        showListData(res.data);
+                    } else {
+                        showListData([]);
+                    }
+                }
+                getlistNotice();
+                async function createNotice() {
+                    $(".loading-wp").show();
+                    var title = $("#title-notice").val();
+                    var content = $("#content-notice").val();
+                    const data = {
+                        title: title,
+                        content: content
+                    }
+                    let res = await api.post("notice/create-thongbao", JSON.stringify(data));
+                    if (res && res.code == 200) {
+                        getlistNotice();
+                    } else {
+                        alert("Có lỗi xảy ra, vui lòng thử lại hoặc liên hệ với chúng tôi");
+                    }
+                    $(".loading-wp").hide();
+                }
+                //thue so
+                $("#taothongbao").unbind("click").click(function () {
+                    createNotice();
+                })
+                // delete 
+                async function deleteNotice(id) {
+                    $(".loading-wp").show();
+                    const data = {
+                        _id: id,
+                    }
+                    let res = await api.post("notice/delete-thongbao", JSON.stringify(data));
+                    if (res && res.code == 200) {
+                        getlistNotice();
+                    } else {
+                        alert("Có lỗi xảy ra, vui lòng thử lại hoặc liên hệ với chúng tôi");
+                    }
+                    $(".loading-wp").hide();
+                }
+                //activeNotice
+                async function activeNotice(id) {
+                    $(".loading-wp").show();
+                    const data = {
+                        _id: id,
+                    }
+                    let res = await api.post("notice/active-thongbao", JSON.stringify(data));
+                    if (res && res.code == 200) {
+                        getlistNotice();
+                    } else {
+                        alert("Có lỗi xảy ra, vui lòng thử lại hoặc liên hệ với chúng tôi");
+                    }
+                    $(".loading-wp").hide();
+                }
+            });
+        </script>

@@ -1,0 +1,200 @@
+<!-- Navbar -->
+<%- include("../client/layout/layoutSidebar.ejs") %>
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <section class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1>Thống kê user</h1>
+                    </div>
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-right">
+                            <li class="breadcrumb-item"><a href="#" class="amount-account">3.000.000 vnđ</a></li>
+                            <li class="breadcrumb-item active" id="username-account">nguyensu</li>
+                        </ol>
+                    </div>
+                </div>
+            </div><!-- /.container-fluid -->
+        </section>
+
+        <!-- Main content -->
+        <section class="content">
+
+            <!-- Default box -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Tạo tài khoản</h3>
+
+                    <div class="card-tools">
+                        <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <table class="table mt-3">
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <input class="form-control" type="text" id="email" placeholder="Nhập Email">
+                                </td>
+                                <td>
+                                    <input class="form-control" type="text" id="username" placeholder="Nhập Username">
+                                </td>
+                                <td>
+                                    <input class="form-control" type="text" id="password" placeholder="Nhập Password">
+                                </td>
+                                <td>
+                                    <button type="button" class="btn btn-outline-success" id="register">Tạo tài
+                                        khoản</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- /.card-body -->
+            </div>
+            <!-- /.card -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Danh sách user</h3>
+
+                    <div class="card-tools">
+                        <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <table class="table mt-3">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th scope="col">STT</th>
+                                <th scope="col">Username</th>
+                                <th scope="col">Email</th>
+                                <th scope="col">Ngày tạo</th>
+                                <th scope="col">Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody id="list-user">
+                        </tbody>
+                    </table>
+                    <div id="demo"></div>
+                </div>
+                <!-- /.card-body -->
+            </div>
+        </section>
+        <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+
+
+    <%- include("../client/layout/layoutFooter.ejs") %>
+
+        <script>
+            $(document).ready(function () {
+                var user = localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")) : null;
+                var contentPay = "";
+                if (user && user.isAdmin) {
+
+                } else {
+                    window.location.href = "login";
+                }
+
+                async function login() {
+                    var username = $("#username").val();
+                    var email = $('#email').val();
+                    var pass = $("#password").val();
+                    const data = {
+                        email: email,
+                        username: username,
+                        password: pass
+                    };
+                    if (pass.length >= 6) {
+                        let res = await api.post("auth/register", JSON.stringify(data));
+                        if (res && res.code == 200) {
+                            localStorage.setItem("token", "");
+                            alert("Tạo tài khoản thành công")
+                        } else {
+                            alert("Email hoặc Username đã tồn tại, vui lòng thử giá trị khác!");
+                        }
+                    } else {
+                        alert("Password phải có độ dài tối thiểu là 6 ký tự");
+                    }
+                }
+
+                $("#register").unbind("click").click(function () {
+                    login();
+                });
+                //get user info
+                async function getUserDetail(id) {
+                    let res = await api.post("user/admin-user", JSON.stringify({id: id}));
+                    if (res && res.code == 200) {
+                        let txt = `user: ${res.data.user}, Số dư ví: ${res.data.amount}, Tổng thanh toán: ${res.data.totalPay}, 
+                        Tổng request: ${res.data.totalRequest}, Tổng OTP: ${res.data.totalOTP}`
+                        alert(txt);
+                    } else {
+                        console.log(res);
+                    }
+                }
+                //show data user
+                function showDataUser(data) {
+                    var html = ``;
+                    var datei;
+                    for (var i = 0; i < data.length; i++) {
+                        datei = new Date(data[i].createdAt);
+                        html += `
+                            <tr>
+                                <td>${i+1}</td>
+                                <td>${data[i].username}</td>
+                                <td>${data[i].email}</td>
+                                <td>${datei.getFullYear() + "-" + (datei.getMonth() + 1) + "-" + datei.getDate()}</td>
+                                <td id="${data[i]._id}" class="detail-user" style="cursor: pointer; color: blue;">Chi tiết</td>    
+                            </tr>
+                        `;
+                    }
+                    $("#list-user").html(html);
+                    $(".detail-user").unbind("click").click(function() {
+                        let id = $(this).attr("id");
+                        getUserDetail(id);
+                    });
+                }
+                var getPage = function (total) {
+                    let ref = [];
+                    for (var i = 0; i < total; i++) {
+                        ref.push(i + 1);
+                    }
+                    return ref;
+                }
+                var page = 1;
+                async function getAllUser(pagea) {
+                    let res = await api.get("user?page=" + page);
+                    if (res && res.code == 200) {
+                        showDataUser(res.data);
+                        let totalPage = res.data.totalPage || 1;
+                        $('#demo').unbind("pagination").pagination({
+                            dataSource: getPage(totalPage),
+                            pageSize: 1,
+                            showPrevious: false,
+                            showNext: false,
+                            afterPageOnClick: function (data, pagination) {
+                                let pageActive = pagination;
+                                getAllUser(pagination, pageActive);
+                            },
+                            callback: function (data, pagination) {
+                                if (pagea) {
+                                    $(".paginationjs-page").removeClass("active");
+                                    $('.paginationjs-page[data-num=' + pagea + ']').addClass("active");
+                                }
+                            }
+                        })
+                    } else {
+                        console.log(res);
+                    }
+                }
+                getAllUser(page);
+            });
+        </script>

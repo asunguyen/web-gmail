@@ -1,0 +1,213 @@
+<!-- Navbar -->
+<%- include("../client/layout/layoutSidebar.ejs") %>
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <section class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1>Active Pay</h1>
+                    </div>
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-right">
+                            <li class="breadcrumb-item"><a href="#">3.000.000 vnđ</a></li>
+                            <li class="breadcrumb-item active">nguyensu</li>
+                        </ol>
+                    </div>
+                </div>
+            </div><!-- /.container-fluid -->
+        </section>
+
+        <!-- Main content -->
+        <section class="content">
+
+            <!-- Default box -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Kích hoạt thanh toán</h3>
+
+                    <div class="card-tools">
+                        <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <table class="table mt-3">
+                        <tbody>
+                            <tr>
+                                <td>Mã giao dịch</td>
+                                <td>
+                                    <input class="form-control" type="text" id="code-pay" placeholder="Nhập mã code">
+                                </td>
+                                <td>
+                                    <input class="form-control" type="number" min="1" id="cupon"
+                                        placeholder="Nhập % giảm giá">
+                                </td>
+                                <td>
+                                    <button type="button" class="btn btn-outline-success" id="getInfo">Lấy thông tin
+                                        giao dịch</button>
+                                </td>
+                            </tr>
+                            <tr class="amount-custom" style="display: none;">
+                                <td>Số tiền thanh toán</td>
+                                <td class="amount-custom">
+                                    <input class="form-control" type="number" min="50" id="amount-pay-custom">.000 vnđ
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <table class="table" id="info-pay" style="display: none;">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th scope="col">STT</th>
+                                <th scope="col">Code</th>
+                                <th scope="col">Số tiền</th>
+                                <th scope="col">Ngày tạo</th>
+                                <th scope="col">Trạng thái</th>
+                            </tr>
+                        </thead>
+                        <tbody id="list-pay">
+                        </tbody>
+                    </table>
+                    <button type="button" style="display: none;" class="amount-custom btn btn-outline-success"
+                        id="hoanthanh">Kích hoạt</button>
+
+                    <table class="table" id="list-pending">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th scope="col">STT</th>
+                                <th scope="col">Code</th>
+                                <th scope="col">Số tiền</th>
+                                <th scope="col">Ngày tạo</th>
+                                <th scope="col">Trạng thái</th>
+                                <th scope="col">Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody id="list-pay-pending">
+                        </tbody>
+                    </table>
+                </div>
+                <!-- /.card-body -->
+
+                <!-- /.card-footer-->
+            </div>
+            <!-- /.card -->
+
+        </section>
+        <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+
+
+    <%- include("../client/layout/layoutFooter.ejs") %>
+
+        <script>
+            $(document).ready(function () {
+                var user = localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")) : null;
+                var contentPay = "";
+                if (user && user.isAdmin) {
+
+                } else {
+                    window.location.href = "login";
+                }
+                getListPending();
+            });
+            function showListData(data) {
+                var html = ``;
+                for (var i = 0; i < data.length; i++) {
+                    var stt = data[i].status == 0 ? "pending" : "actived";
+                    html += `<tr>
+                            <th scope="row">`+ (i + 1) + `</th>
+                            <td>`+ data[i].code + `</td>
+                            <td>`+ data[i].amount + `.000 vnđ</td>
+                            <td>`+ data[i].createdAt + `</td>
+                            <td>`+ stt + `</td>
+                        </tr>`;
+                }
+                $("#list-pay").html(html);
+                $("#info-pay").show();
+                if (data && data.length > 0 && data[0].status == 0) {
+                    $("#hoanthanh").show();
+                }
+            }
+            function showListDataPending(data) {
+                var html = ``;
+                for (var i = 0; i < data.length; i++) {
+                    var stt = data[i].status == 0 ? "pending" : "actived";
+                    html += `<tr>
+                            <th scope="row">`+ (i + 1) + `</th>
+                            <td>`+ data[i].code + `</td>
+                            <td>`+ data[i].amount + `.000 vnđ</td>
+                            <td>`+ data[i].createdAt + `</td>
+                            <td>`+ stt + `</td>
+                            <td> <button id="${data[i].code}" class="btn btn-outline-success active-payment">Kích hoạt</button><button id="${data[i]._id}" class="ml-1 btn btn-outline-danger cancel-payment">Cancel</button> </td>
+                        </tr>`;
+                }
+                $("#list-pay-pending").html(html);
+                $(".active-payment").unbind("click").click(function () {
+                    var code = $(this).attr("id");
+                    activePayment(code);
+                })
+                $(".cancel-payment").unbind("click").click(function() {
+                    var id = $(this).attr("id");
+                    removePayment(id);
+                })
+            }
+            async function removePayment(id) {
+                var res = await api.post("payment/delete-deposit", JSON.stringify({ id: id}));
+                if (res && res.code == 200) {
+                    getListPending();
+                    alert("Đã xóa thành công");
+                } else {
+                    alert("Có lỗi xảy ra, vui lòng thử lại hoặc liên hệ với chúng tôi");
+                }
+            }
+            async function activePayment(code) {
+                var res = await api.post("payment/active-deposit", JSON.stringify({ code: code, cupon: 0 }));
+                if (res && res.code == 200) {
+                    getListPending();
+                    alert("Kích hoạt thành công");
+                } else {
+                    alert("Có lỗi xảy ra, vui lòng thử lại hoặc liên hệ với chúng tôi");
+                }
+            }
+            async function getInfo() {
+                var codepay = $("#code-pay").val();
+                var res = await api.get("payment/info-code/" + codepay);
+                if (res && res.code == 200) {
+                    showListData(res.data);
+                } else {
+                    alert("Có lỗi xảy ra, vui lòng thử lại hoặc liên hệ với chúng tôi");
+                }
+            }
+            $("#getInfo").unbind("click").click(function () {
+                getInfo();
+            });
+            async function activeCode() {
+                var codepay = $("#code-pay").val();
+                const cupon = $("#cupon").val();
+                var res = await api.post("payment/active-deposit", JSON.stringify({ code: codepay, cupon: cupon }));
+                if (res && res.code == 200) {
+                    getInfo();
+                } else {
+                    alert("Có lỗi xảy ra, vui lòng thử lại hoặc liên hệ với chúng tôi");
+                }
+            }
+            $("#hoanthanh").unbind("click").click(function () {
+                activeCode();
+            });
+
+            async function getListPending() {
+                var res = await api.get("admin/list-pending");
+                if (res && res.code == 200) {
+                    showListDataPending(res.data);
+                } else {
+                    alert("Có lỗi xảy ra, vui lòng thử lại hoặc liên hệ với chúng tôi");
+                }
+            }
+
+        </script>

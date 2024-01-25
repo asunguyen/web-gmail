@@ -1,0 +1,29 @@
+{
+  "name": "apiotp",
+  "version": "1.0.0",
+  "description": "đây là code api otp anh Kiên",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "ktool.site",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.5.1",
+    "bcrypt": "^5.1.1",
+    "body-parser": "^1.20.2",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "ejs": "^3.1.9",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.2",
+    "mongodb": "6.1",
+    "mongoose": "^7.5.3",
+    "multer": "^1.4.5-lts.1"
+  },
+  "engines": {
+    "node": ">=15"
+  }
+}

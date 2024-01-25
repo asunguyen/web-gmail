@@ -1,0 +1,136 @@
+<!-- Navbar -->
+<%- include("./layout/layoutSidebar.ejs") %>
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <section class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1>Deposit</h1>
+                    </div>
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-right">
+                            <li class="breadcrumb-item"><a href="#" class="amount-account"></a></li>
+                            <li class="breadcrumb-item active" id="username-account"></li>
+                        </ol>
+                    </div>
+                </div>
+            </div><!-- /.container-fluid -->
+        </section>
+
+        <!-- Main content -->
+        <section class="content">
+
+            <!-- Default box -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Thông tin thanh toán</h3>
+
+                    <div class="card-tools">
+                        <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    Ấn nút "Hoàn Thành" sau khi thanh toán để kiểm tra giao dịch
+
+                    <table class="table mt-3">
+                        <tbody>
+                            <tr>
+                                <td>Ngân hàng</td>
+                                <td>Vietcombank</td>
+                                <td class="amount-custom" style="display: none;"></td>
+                            </tr>
+                            <tr>
+                                <td>Chủ tài khoản</td>
+                                <td>NGUYEN QUANG KIEN</td>
+                                <td class="amount-custom" style="display: none;"></td>
+                            </tr>
+                            <tr>
+                                <td>Số tài khoản</td>
+                                <td>0451001519467</td>
+                                <td class="amount-custom" style="display: none;"></td>
+                            </tr>
+                            <tr>
+                                <td>Nội dung chuyển khoản</td>
+                                <td id="content-pay"></td>
+                                <td class="amount-custom" style="display: none;"></td>
+                            </tr>
+                            <tr>
+                                <td>Gói thanh toán</td>
+                                <td>
+                                    <select class="custom-select" id="amount-pay">
+                                        <option selected value="1000">1.000.000 vnđ</option>
+                                        <option value="3000">3.000.000 vnđ</option>
+                                        <option value="5000">5.000.000 vnđ</option>
+                                        <option value="10000">10.000.000 vnđ</option>
+                                        <option value="0">Lựa chọn khác</option>
+                                    </select>
+                                </td>
+                                <td class="amount-custom" style="display: none;">
+                                    <input class="form-control" type="number" min="50" id="amount-pay-custom"
+                                        placeholder="Vui lòng nhập số tiền thanh toán, tối thiểu là 50">.000 vnđ
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- /.card-body -->
+                <div class="card-footer">
+                    <button type="button" class="btn btn-outline-success" id="hoanthanh">Hoàn thành</button>
+                </div>
+                <!-- /.card-footer-->
+            </div>
+            <!-- /.card -->
+
+        </section>
+        <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+
+
+    <%- include("./layout/layoutFooter.ejs") %>
+
+        <script>
+            $(document).ready(function () {
+                var user = localStorage.getItem("user");
+                var contentPay = "";
+                if (user) {
+                    user = JSON.parse(user);
+                    contentPay = "kl" + user.username + new Date().getTime();
+                    $("#content-pay").text(contentPay);
+                } else {
+                    window.location.href = "/login";
+                }
+                async function createDep() {
+                    var amount = $("#amount-pay").val();
+                    if (amount == 0) {
+                        amount = $("#amount-pay-custom").val() || 50;
+                    }
+                    const data = {
+                        amount: amount,
+                        code: contentPay
+                    }
+                    let res = await api.post("payment/create-deposit", JSON.stringify(data));
+                    if (res && res.code == 200) {
+                        window.location.href = "/history-deposit";
+                    } else {
+                        alert("Có lỗi xảy ra, vui lòng thử lại hoặc liên hệ với chúng tôi");
+                    }
+                }
+                $("#hoanthanh").unbind("click").click(function () {
+                    createDep();
+                });
+                $("#amount-pay").unbind("change").change(function () {
+                    if ($(this).val() == 0) {
+                        $(".amount-custom").show();
+                    } else {
+                        $(".amount-custom").hide();
+                    }
+                })
+            })
+
+        </script>
