@@ -13,7 +13,11 @@ const uploadRouter = require("./routers/uploadRouter");
 const postRouter = require("./routers/postRouter");
 const sliderRouter = require("./routers/sliderRouter");
 const productTypeRouter = require("./routers/productTypeRouter");
-const productRouter = require("./routers/productRouter")
+const productRouter = require("./routers/productRouter");
+
+const payRouter = require("./routers/payment");
+const thongbaoRouter = require("./routers/thongbaoRouter");
+
 var fs = require('fs');
 dotenv.config();
 var app = express();
@@ -36,6 +40,9 @@ app.use("/v1/posts", postRouter);
 app.use("/v1/slider", sliderRouter);
 app.use("/v1/product-type", productTypeRouter);
 app.use("/v1/product", productRouter);
+
+app.use("/v1/payment", payRouter);
+app.use("/v1/notice/", thongbaoRouter);
 
 const dbUrl = process.env.mongodbUrl;
 const connectionParams = {
