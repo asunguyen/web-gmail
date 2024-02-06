@@ -1,8 +1,17 @@
 const mongoose = require('mongoose');
 const gmailModel = new mongoose.Schema({
+    pass: {
+        type: String
+    },
     mail: {
         type: String,
         require: true,
+    },
+    time: {
+        type: String,
+    },
+    token: {
+        type: String
     },
     handle: {
         type: Number,
