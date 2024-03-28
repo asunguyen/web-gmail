@@ -38,5 +38,5 @@ const gmailModel = new mongoose.Schema({
 
 }, {timestamps: true});
 
-module.exports = mongoose.model("gmailModel", gmailModel);
+module.exports = mongoose.model("gmail", gmailModel);
 
